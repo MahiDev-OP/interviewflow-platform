@@ -1,0 +1,196 @@
+previews:
+  generation: off
+
+envVarGroups:
+  - name: interviewflow-shared
+    envVars:
+      - key: APP_JWT_SECRET
+        generateValue: true
+      - key: APP_JWT_EXPIRATION_MILLIS
+        value: "86400000"
+      - key: APPLICATION_EVENTS_TOPIC
+        value: application-events
+      - key: REMINDER_EVENTS_TOPIC
+        value: reminder-events
+      - key: APP_CORS_ALLOWED_ORIGIN_PATTERNS
+        value: http://localhost:3000,https://interviewflow-platform.vercel.app,https://*.vercel.app
+
+databases:
+  - name: interviewflow-postgres
+    plan: free
+    databaseName: interviewflow
+
+services:
+  - type: pserv
+    name: interviewflow-redpanda
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./infra/redpanda/Dockerfile
+    dockerContext: ./infra/redpanda
+    envVars:
+      - key: PORT
+        value: "9092"
+    disk:
+      name: redpanda-data
+      mountPath: /var/lib/redpanda/data
+      sizeGB: 10
+
+  - type: pserv
+    name: interviewflow-auth
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./backend/auth-service/Dockerfile
+    dockerContext: ./backend/auth-service
+    healthCheckPath: /actuator/health
+    envVars:
+      - fromGroup: interviewflow-shared
+      - key: PORT
+        value: "10000"
+      - key: DB_HOST
+        fromDatabase:
+          name: interviewflow-postgres
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: interviewflow-postgres
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: interviewflow-postgres
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: interviewflow-postgres
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: interviewflow-postgres
+          property: password
+
+  - type: pserv
+    name: interviewflow-application
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./backend/application-service/Dockerfile
+    dockerContext: ./backend/application-service
+    healthCheckPath: /actuator/health
+    envVars:
+      - fromGroup: interviewflow-shared
+      - key: PORT
+        value: "10000"
+      - key: DB_HOST
+        fromDatabase:
+          name: interviewflow-postgres
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: interviewflow-postgres
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: interviewflow-postgres
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: interviewflow-postgres
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: interviewflow-postgres
+          property: password
+      - key: KAFKA_HOST
+        fromService:
+          name: interviewflow-redpanda
+          type: pserv
+          property: host
+      - key: KAFKA_PORT
+        fromService:
+          name: interviewflow-redpanda
+          type: pserv
+          property: port
+
+  - type: pserv
+    name: interviewflow-notification
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./backend/notification-service/Dockerfile
+    dockerContext: ./backend/notification-service
+    healthCheckPath: /actuator/health
+    envVars:
+      - fromGroup: interviewflow-shared
+      - key: PORT
+        value: "10000"
+      - key: NOTIFICATION_CONSUMER_GROUP
+        value: notification-service
+      - key: DB_HOST
+        fromDatabase:
+          name: interviewflow-postgres
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: interviewflow-postgres
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: interviewflow-postgres
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: interviewflow-postgres
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: interviewflow-postgres
+          property: password
+      - key: KAFKA_HOST
+        fromService:
+          name: interviewflow-redpanda
+          type: pserv
+          property: host
+      - key: KAFKA_PORT
+        fromService:
+          name: interviewflow-redpanda
+          type: pserv
+          property: port
+
+  - type: web
+    name: interviewflow-gateway
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./backend/api-gateway/Dockerfile
+    dockerContext: ./backend/api-gateway
+    healthCheckPath: /actuator/health
+    envVars:
+      - fromGroup: interviewflow-shared
+      - key: PORT
+        value: "10000"
+      - key: AUTH_SERVICE_HOST
+        fromService:
+          name: interviewflow-auth
+          type: pserv
+          property: host
+      - key: AUTH_SERVICE_PORT
+        fromService:
+          name: interviewflow-auth
+          type: pserv
+          property: port
+      - key: APPLICATION_SERVICE_HOST
+        fromService:
+          name: interviewflow-application
+          type: pserv
+          property: host
+      - key: APPLICATION_SERVICE_PORT
+        fromService:
+          name: interviewflow-application
+          type: pserv
+          property: port
+      - key: NOTIFICATION_SERVICE_HOST
+        fromService:
+          name: interviewflow-notification
+          type: pserv
+          property: host
+      - key: NOTIFICATION_SERVICE_PORT
+        fromService:
+          name: interviewflow-notification
+          type: pserv
+          property: port

@@ -72,16 +72,41 @@ npm run dev
 
 ## Local defaults
 
-- The frontend talks to `http://localhost:8090`.
+- The frontend talks to `http://localhost:8090` in local development.
+- In deployed environments the frontend reads `NEXT_PUBLIC_API_URL`.
 - PostgreSQL runs on `localhost:5433` by default.
 - Redpanda exposes Kafka on `localhost:9092`.
 - All Spring services use the same JWT secret through `APP_JWT_SECRET`.
 - Settings can be overridden with environment variables shown in `.env.example`.
+
+## Production deployment
+
+The production shape for this repo is:
+
+- Vercel hosts the Next.js frontend.
+- Render hosts the Spring Boot gateway as the only public backend URL.
+- Render hosts auth, application, notification, and Redpanda as private services.
+- Render Postgres is shared by the backend services.
+
+Files added for that setup:
+
+- `render.yaml`
+- `backend/*/Dockerfile`
+- `infra/redpanda/Dockerfile`
+
+After Render gives you the gateway URL, set this in Vercel:
+
+```text
+NEXT_PUBLIC_API_URL=https://your-gateway.onrender.com
+```
+
+Then redeploy the frontend so every request goes straight to the backend gateway over HTTPS.
 
 ## A couple of practical notes
 
 - The gateway uses `8090` in this project, not `8080`.
 - `docker-compose.yml` belongs in the repo because it is part of the local development setup for Postgres and Redpanda.
 - The databases are created automatically by `infra/postgres/init/01-create-databases.sql` when Postgres starts for the first time.
+- The frontend API helper strips BOM characters, trims whitespace, normalizes missing protocols, and avoids malformed URLs in production.
 - Reminder notifications appear after the reminder time has passed and the notification service scheduler picks them up.
 - The long-form study notes for this project are intentionally kept outside this repo.
