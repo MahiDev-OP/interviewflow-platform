@@ -106,10 +106,10 @@ public class GatewayController {
         request.headers(outgoing -> copyHeaders(headers, outgoing));
 
         if (body != null) {
-            return request.bodyValue(body).retrieve().toEntity(String.class);
+            return request.bodyValue(body).exchangeToMono(response -> response.toEntity(String.class));
         }
 
-        return request.retrieve().toEntity(String.class);
+        return request.exchangeToMono(response -> response.toEntity(String.class));
     }
 
     private void copyHeaders(HttpHeaders incoming, HttpHeaders outgoing) {

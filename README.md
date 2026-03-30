@@ -73,12 +73,15 @@ npm run dev
 ## Local defaults
 
 - The frontend talks to `http://localhost:8090`.
-- PostgreSQL runs on `localhost:5433` with `postgres/postgres`.
+- PostgreSQL runs on `localhost:5433` by default.
 - Redpanda exposes Kafka on `localhost:9092`.
 - All Spring services use the same JWT secret through `APP_JWT_SECRET`.
+- Settings can be overridden with environment variables shown in `.env.example`.
 
 ## A couple of practical notes
 
 - The gateway uses `8090` in this project, not `8080`.
+- `docker-compose.yml` belongs in the repo because it is part of the local development setup for Postgres and Redpanda.
+- The databases are created automatically by `infra/postgres/init/01-create-databases.sql` when Postgres starts for the first time.
 - Reminder notifications appear after the reminder time has passed and the notification service scheduler picks them up.
 - The long-form study notes for this project are intentionally kept outside this repo.
