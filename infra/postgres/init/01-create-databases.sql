@@ -1,0 +1,3 @@
+CREATE DATABASE interviewflow_auth;
+CREATE DATABASE interviewflow_application;
+CREATE DATABASE interviewflow_notification;
