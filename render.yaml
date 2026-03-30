@@ -13,7 +13,7 @@ envVarGroups:
       - key: REMINDER_EVENTS_TOPIC
         value: reminder-events
       - key: APP_CORS_ALLOWED_ORIGIN_PATTERNS
-        value: http://localhost:3000,https://interviewflow-platform.vercel.app,https://*.vercel.app
+        sync: false
 
 databases:
   - name: interviewflow-postgres
@@ -46,23 +46,15 @@ services:
       - fromGroup: interviewflow-shared
       - key: PORT
         value: "10000"
-      - key: DB_HOST
+      - key: AUTH_DB_URL
         fromDatabase:
           name: interviewflow-postgres
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: interviewflow-postgres
-          property: port
-      - key: DB_NAME
-        fromDatabase:
-          name: interviewflow-postgres
-          property: database
-      - key: DB_USERNAME
+          property: connectionString
+      - key: AUTH_DB_USERNAME
         fromDatabase:
           name: interviewflow-postgres
           property: user
-      - key: DB_PASSWORD
+      - key: AUTH_DB_PASSWORD
         fromDatabase:
           name: interviewflow-postgres
           property: password
@@ -78,23 +70,15 @@ services:
       - fromGroup: interviewflow-shared
       - key: PORT
         value: "10000"
-      - key: DB_HOST
+      - key: APPLICATION_DB_URL
         fromDatabase:
           name: interviewflow-postgres
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: interviewflow-postgres
-          property: port
-      - key: DB_NAME
-        fromDatabase:
-          name: interviewflow-postgres
-          property: database
-      - key: DB_USERNAME
+          property: connectionString
+      - key: APPLICATION_DB_USERNAME
         fromDatabase:
           name: interviewflow-postgres
           property: user
-      - key: DB_PASSWORD
+      - key: APPLICATION_DB_PASSWORD
         fromDatabase:
           name: interviewflow-postgres
           property: password
@@ -122,23 +106,15 @@ services:
         value: "10000"
       - key: NOTIFICATION_CONSUMER_GROUP
         value: notification-service
-      - key: DB_HOST
+      - key: NOTIFICATION_DB_URL
         fromDatabase:
           name: interviewflow-postgres
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: interviewflow-postgres
-          property: port
-      - key: DB_NAME
-        fromDatabase:
-          name: interviewflow-postgres
-          property: database
-      - key: DB_USERNAME
+          property: connectionString
+      - key: NOTIFICATION_DB_USERNAME
         fromDatabase:
           name: interviewflow-postgres
           property: user
-      - key: DB_PASSWORD
+      - key: NOTIFICATION_DB_PASSWORD
         fromDatabase:
           name: interviewflow-postgres
           property: password
@@ -164,6 +140,8 @@ services:
       - fromGroup: interviewflow-shared
       - key: PORT
         value: "10000"
+      - key: AUTH_SERVICE_SCHEME
+        value: http
       - key: AUTH_SERVICE_HOST
         fromService:
           name: interviewflow-auth
@@ -174,6 +152,8 @@ services:
           name: interviewflow-auth
           type: pserv
           property: port
+      - key: APPLICATION_SERVICE_SCHEME
+        value: http
       - key: APPLICATION_SERVICE_HOST
         fromService:
           name: interviewflow-application
@@ -184,6 +164,8 @@ services:
           name: interviewflow-application
           type: pserv
           property: port
+      - key: NOTIFICATION_SERVICE_SCHEME
+        value: http
       - key: NOTIFICATION_SERVICE_HOST
         fromService:
           name: interviewflow-notification

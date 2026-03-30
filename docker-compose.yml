@@ -36,11 +36,11 @@ services:
       - --kafka-addr
       - internal://0.0.0.0:9092,external://0.0.0.0:19092
       - --advertise-kafka-addr
-      - internal://redpanda:9092,external://localhost:9092
+      - internal://redpanda:9092,external://${REDPANDA_EXTERNAL_HOST:-host.docker.internal}:9092
       - --pandaproxy-addr
       - internal://0.0.0.0:8082,external://0.0.0.0:18082
       - --advertise-pandaproxy-addr
-      - internal://redpanda:8082,external://localhost:18082
+      - internal://redpanda:8082,external://${REDPANDA_PANDAPROXY_HOST:-host.docker.internal}:18082
     ports:
       - "9092:19092"
       - "9644:9644"

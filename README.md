@@ -24,61 +24,6 @@ The app has a Next.js frontend, four Spring Boot services, PostgreSQL for storag
 6. The notification service listens for those events and turns them into dashboard notifications.
 7. Reminder schedules are checked on a timer, and due reminders are added to the feed.
 
-## Local URLs
-
-- Frontend: [http://localhost:3000](http://localhost:3000)
-- Gateway: [http://localhost:8090](http://localhost:8090)
-- Auth health: [http://localhost:8081/actuator/health](http://localhost:8081/actuator/health)
-- Application health: [http://localhost:8082/actuator/health](http://localhost:8082/actuator/health)
-- Notification health: [http://localhost:8083/actuator/health](http://localhost:8083/actuator/health)
-
-## Run it locally
-
-Start infrastructure first:
-
-```powershell
-docker compose up -d
-```
-
-Then start the backend services in separate terminals:
-
-```powershell
-cd backend/auth-service
-.\mvnw.cmd spring-boot:run
-```
-
-```powershell
-cd backend/application-service
-.\mvnw.cmd spring-boot:run
-```
-
-```powershell
-cd backend/notification-service
-.\mvnw.cmd spring-boot:run
-```
-
-```powershell
-cd backend/api-gateway
-.\mvnw.cmd spring-boot:run
-```
-
-Start the frontend last:
-
-```powershell
-cd frontend
-npm install
-npm run dev
-```
-
-## Local defaults
-
-- The frontend talks to `http://localhost:8090` in local development.
-- In deployed environments the frontend reads `NEXT_PUBLIC_API_URL`.
-- PostgreSQL runs on `localhost:5433` by default.
-- Redpanda exposes Kafka on `localhost:9092`.
-- All Spring services use the same JWT secret through `APP_JWT_SECRET`.
-- Settings can be overridden with environment variables shown in `.env.example`.
-
 ## Production deployment
 
 The production shape for this repo is:
@@ -94,6 +39,12 @@ Files added for that setup:
 - `backend/*/Dockerfile`
 - `infra/redpanda/Dockerfile`
 
+Important configuration rules:
+
+- The frontend must use `NEXT_PUBLIC_API_URL` and point to the public gateway URL.
+- The backend services must receive their database, Kafka, JWT, and internal service settings from environment variables.
+- `.env.example` is only a template of variable names and placeholder values. It must never contain real passwords, real API keys, or production secrets.
+
 After Render gives you the gateway URL, set this in Vercel:
 
 ```text
@@ -101,6 +52,13 @@ NEXT_PUBLIC_API_URL=https://your-gateway.onrender.com
 ```
 
 Then redeploy the frontend so every request goes straight to the backend gateway over HTTPS.
+
+## Local development
+
+Local development is optional and should use a private `.env` file that is never committed.
+
+- `docker-compose.yml` is kept in the repo only for local infrastructure.
+- `.env.example` is intentionally safe for GitHub and should be copied into a private env file with real values on your machine or hosting platform.
 
 ## A couple of practical notes
 
