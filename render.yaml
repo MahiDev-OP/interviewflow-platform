@@ -140,6 +140,8 @@ services:
       - fromGroup: interviewflow-shared
       - key: PORT
         value: "10000"
+      - key: APP_CORS_ALLOWED_ORIGIN_PATTERNS
+        Value: https://interviewflow-platform.vercel.app
       - key: AUTH_SERVICE_SCHEME
         value: http
       - key: AUTH_SERVICE_HOST

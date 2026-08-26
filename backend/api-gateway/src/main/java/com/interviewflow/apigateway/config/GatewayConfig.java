@@ -19,8 +19,7 @@ public class GatewayConfig {
 
     @Bean
     CorsWebFilter corsWebFilter(
-            @Value("${app.cors.allowed-origin-patterns}") List<String> allowedOriginPatterns
-    ) {
+            @Value("${app.cors.allowed-origin-patterns}") List<String> allowedOriginPatterns) {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(allowedOriginPatterns);
         configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
