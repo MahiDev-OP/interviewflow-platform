@@ -41,7 +41,6 @@ services:
     plan: starter
     dockerfilePath: ./backend/auth-service/Dockerfile
     dockerContext: ./backend/auth-service
-    healthCheckPath: /actuator/health
     envVars:
       - fromGroup: interviewflow-shared
       - key: PORT
@@ -65,7 +64,6 @@ services:
     plan: starter
     dockerfilePath: ./backend/application-service/Dockerfile
     dockerContext: ./backend/application-service
-    healthCheckPath: /actuator/health
     envVars:
       - fromGroup: interviewflow-shared
       - key: PORT
@@ -99,7 +97,6 @@ services:
     plan: starter
     dockerfilePath: ./backend/notification-service/Dockerfile
     dockerContext: ./backend/notification-service
-    healthCheckPath: /actuator/health
     envVars:
       - fromGroup: interviewflow-shared
       - key: PORT
