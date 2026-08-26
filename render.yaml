@@ -13,7 +13,7 @@ envVarGroups:
       - key: REMINDER_EVENTS_TOPIC
         value: reminder-events
       - key: APP_CORS_ALLOWED_ORIGIN_PATTERNS
-        sync: false
+        value: https://interviewflow-platform.vercel.app
 
 databases:
   - name: interviewflow-postgres
